@@ -72,6 +72,8 @@ Worker нужен выбранному способу имитации API. Он
 
 Репозиторий: [r33n99/meeting-room](https://github.com/r33n99/meeting-room).
 
+Демо: [meeting-room-drab.vercel.app](https://meeting-room-drab.vercel.app).
+
 Время выполнения: около 4 часов.
 
 Проект создавался и изменялся с помощью Codex. Для сдачи отдельно приложить переписку с AI, как указано в ТЗ.

@@ -3,8 +3,6 @@ dist/
 playwright-report/
 test-results/
 output/
-.env.local
-.env.*.local
+.env*
 AGENTS.md
 .vercel/
-.env

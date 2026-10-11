@@ -1,0 +1,83 @@
+@use '@/styles/tokens' as t;
+
+.month-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.month-name {
+  font-size: var(--month-name-size, 12px);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.month-arrows {
+  display: flex;
+  gap: 1px;
+
+  .icon-button {
+    width: 24px;
+    height: 26px;
+  }
+}
+
+.month-weekdays,
+.month-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.month-weekdays {
+  margin-bottom: 8px;
+  text-align: center;
+  color: #87909a;
+  font-size: 10px;
+}
+
+.month-days {
+  row-gap: 5px;
+}
+
+.month-day {
+  position: relative;
+  height: var(--month-day-height, 29px);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  font-size: 11px;
+
+  &.outside {
+    color: #929aa3;
+  }
+
+  &:disabled {
+    color: #c1c6cc;
+  }
+
+  &:hover:not(:disabled) {
+    background: #e8ebef;
+  }
+
+  &.today:not(.selected)::after {
+    position: absolute;
+    bottom: 2px;
+    left: calc(50% - 7px);
+    width: 14px;
+    height: 2px;
+    background: t.$primary;
+    content: '';
+  }
+
+  &.selected {
+    background: t.$primary;
+    color: t.$surface;
+    font-weight: 500;
+  }
+
+  &.selected:hover {
+    background: t.$primary-hover;
+  }
+}

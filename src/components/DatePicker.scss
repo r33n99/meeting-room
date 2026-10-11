@@ -1,0 +1,54 @@
+@use '@/styles/tokens' as t;
+@use '@/styles/mixins' as m;
+
+.date-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 43px;
+  padding: 0 12px;
+  border: 1px solid t.$input-border;
+  border-radius: 3px;
+  background: t.$surface;
+  color: #343d48;
+  text-align: left;
+  font-size: 13px;
+
+  > svg {
+    color: #929aa4;
+    flex-shrink: 0;
+  }
+
+  &[aria-invalid='true'] {
+    border-color: t.$error;
+  }
+}
+
+.date-caret {
+  margin-left: auto;
+}
+
+.date-popover {
+  @include m.popover(270px);
+  --month-day-height: 30px;
+  --month-name-size: 13px;
+  max-width: calc(100vw - 32px);
+  padding: 17px;
+}
+
+.date-trigger--compact {
+  @include m.mobile {
+    border: 0;
+    padding: 0;
+    min-height: 28px;
+    width: auto;
+    font-size: 15px;
+    font-weight: 500;
+    gap: 6px;
+
+    > svg:first-child {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,127 @@
+import { expect, test, type Page } from '@playwright/test'
+import { formatDate, roomNow, shiftDate } from '../src/domain/time'
+
+const date = shiftDate(roomNow().date, 3)
+
+async function prepare(page: Page) {
+  await page.goto('/?demo=1')
+  await expect(page.getByRole('heading', { name: 'Переговорная', exact: true })).toBeVisible()
+  await page.locator('summary').click()
+  await page.getByRole('button', { name: 'Сбросить демо-данные' }).click()
+  await expect(page.getByText('Данные сброшены')).toBeVisible()
+  for (let index = 0; index < 3; index++) await page.getByRole('button', { name: 'Следующий день', exact: true }).click()
+  await expect(page.getByText('Свободно')).toBeVisible()
+}
+
+async function openForm(page: Page, title: string, start = '09:00', end = '10:00') {
+  await page.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Название встречи', { exact: false }).fill(title)
+  await dialog.getByRole('button', { name: 'Дата', exact: true }).click()
+  await page.locator('.date-popover').getByRole('button', { name: formatDate(date, { day: 'numeric', month: 'long', year: 'numeric' }), exact: true }).click()
+  await dialog.getByLabel('Начало', { exact: true }).fill(start)
+  await dialog.getByLabel('Окончание', { exact: true }).fill(end)
+  return dialog
+}
+
+test('create, edit, persist after refresh, and delete a booking', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await prepare(page)
+  const dialog = await openForm(page, 'Проверка проекта', '09:15', '10:15')
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(page.getByText('Бронирование создано', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /Проверка проекта, 09:15/ }).click()
+  await page.getByLabel('Название встречи', { exact: false }).fill('Обновлённая встреча')
+  await page.getByRole('button', { name: 'Сохранить', exact: true }).click()
+  await expect(page.getByText('Бронирование обновлено', { exact: true })).toBeVisible()
+  await page.reload()
+  for (let index = 0; index < 3; index++) await page.getByRole('button', { name: 'Следующий день', exact: true }).click()
+  const booking = page.getByRole('button', { name: /Обновлённая встреча, 09:15/ })
+  await expect(booking).toBeVisible()
+  await booking.click()
+  await page.getByRole('button', { name: 'Удалить бронирование', exact: true }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Удалить', exact: true }).click()
+  await expect(page.getByText('Бронирование удалено', { exact: true })).toBeVisible()
+  await expect(page.getByText('Свободно')).toBeVisible()
+  expect(errors).toEqual([])
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('409 refreshes bookings, keeps draft, and lets the user resubmit', async ({ page }) => {
+  await prepare(page)
+  await page.getByRole('button', { name: 'Конфликт при сохранении (409)' }).click()
+  await expect(page.getByText('Следующая операция: 409', { exact: false })).toBeVisible()
+  const dialog = await openForm(page, 'Сохранённый черновик')
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(dialog.getByRole('alert')).toContainText('это время заняли')
+  await expect(dialog.getByLabel('Название встречи', { exact: false })).toHaveValue('Сохранённый черновик')
+  await expect(dialog.getByLabel('Начало', { exact: true })).toHaveValue('09:00')
+  // The modal correctly hides the background from the accessibility tree.
+  await expect(page.locator('.booking-block').filter({ hasText: 'Встреча другого участника' })).toBeAttached()
+  await dialog.getByLabel('Начало', { exact: true }).fill('10:00')
+  await dialog.getByLabel('Окончание', { exact: true }).fill('10:30')
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(page.getByText('Бронирование создано', { exact: true })).toBeVisible()
+})
+
+test('list errors and submission errors recover without losing form values', async ({ page }) => {
+  await prepare(page)
+  await page.getByRole('button', { name: 'Ошибка загрузки', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('Не удалось загрузить расписание')
+  await page.getByRole('button', { name: 'Повторить' }).click()
+  await expect(page.getByText('Свободно')).toBeVisible()
+  await page.getByRole('button', { name: 'Ошибка сохранения (503)' }).click()
+  await expect(page.getByText('Следующая операция: 503', { exact: false })).toBeVisible()
+  const dialog = await openForm(page, 'Повторная отправка')
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(dialog.getByRole('alert')).toContainText('временно недоступен')
+  await expect(dialog.getByLabel('Название встречи', { exact: false })).toHaveValue('Повторная отправка')
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(page.getByText('Бронирование создано', { exact: true })).toBeVisible()
+})
+
+test('form validates duration and can close with Escape', async ({ page }) => {
+  await prepare(page)
+  const dialog = await openForm(page, 'Короткая встреча', '09:00', '09:15')
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(dialog.getByText('Минимальная длительность — 30 минут', { exact: true })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(dialog).not.toBeVisible()
+  await expect(page.getByRole('button', { name: 'Забронировать', exact: true })).toBeFocused()
+})
+
+test('custom calendar and time fields support keyboard selection and exact minutes', async ({ page }) => {
+  await prepare(page)
+  const dialog = await openForm(page, 'Точное время', '9:07', '09:45')
+  await dialog.getByLabel('Начало', { exact: true }).press('Tab')
+  await expect(dialog.getByLabel('Начало', { exact: true })).toHaveValue('09:07')
+  await dialog.getByLabel('Начало', { exact: true }).press('ArrowUp')
+  await expect(dialog.getByLabel('Начало', { exact: true })).toHaveValue('09:08')
+  await dialog.getByRole('button', { name: 'Выбрать время: окончание', exact: true }).click()
+  await page.locator('.time-popover').getByRole('button', { name: '10:00', exact: true }).click()
+  await expect(dialog.getByLabel('Окончание', { exact: true })).toHaveValue('10:00')
+  await dialog.getByRole('button', { name: 'Дата', exact: true }).click()
+  const selected = page.locator('.date-popover').getByRole('button', { name: formatDate(date, { day: 'numeric', month: 'long', year: 'numeric' }), exact: true })
+  await selected.press('ArrowRight')
+  const nextDay = page.locator('.date-popover').getByRole('button', { name: formatDate(shiftDate(date, 1), { day: 'numeric', month: 'long', year: 'numeric' }), exact: true })
+  await expect(nextDay).toBeFocused()
+  await nextDay.press('Enter')
+  await expect(page.locator('.date-popover')).not.toBeVisible()
+  await expect(page.locator('input[type="date"], input[type="time"]')).toHaveCount(0)
+  await dialog.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(page.getByRole('button', { name: /Точное время, 09:08–10:00/ })).toBeVisible()
+})
+
+test('normal UI stays compact and fits the screen', async ({ page }, testInfo) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Переговорная', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Следующий день', exact: true }).click()
+  await expect(page.getByText('3 брони', { exact: true })).toBeVisible()
+  await expect(page.locator('.demo-panel')).toHaveCount(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.screenshot({ path: `output/ui/${testInfo.project.name}.png`, fullPage: true })
+  await page.getByRole('button', { name: 'Забронировать', exact: true }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.screenshot({ path: `output/ui/${testInfo.project.name}-form.png` })
+})

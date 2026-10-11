@@ -1,0 +1,58 @@
+@use 'tokens' as t;
+
+:root {
+  font-family: t.$font-sans;
+  color: t.$foreground;
+  background: t.$background;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: t.$border;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 120ms,
+      color 120ms;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  button:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid t.$primary;
+    outline-offset: 3px;
+  }
+}
+
+// Accessibility override applies even to animations supplied by UI libraries.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,199 @@
+@use '@/styles/tokens' as t;
+@use '@/styles/mixins' as m;
+
+.booking-modal {
+  display: block;
+  padding: 0;
+  border: 1px solid #d9dfe6;
+  border-radius: 6px;
+  background: t.$surface;
+  max-height: 90dvh;
+  overflow-y: auto;
+  box-shadow: 0 18px 70px #18243320;
+
+  .modal-header {
+    padding: 23px 26px 18px;
+    border-bottom: 1px solid t.$border;
+  }
+
+  .modal-header h2 {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.35px;
+  }
+
+  .booking-form {
+    padding: 22px 26px 0;
+  }
+
+  .form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-fields:disabled {
+    opacity: 0.65;
+  }
+
+  .field-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #727c88;
+  }
+
+  .name-input {
+    display: block;
+    width: 100%;
+    height: 42px;
+    padding: 0 0 9px;
+    border: 0;
+    border-bottom: 1px solid #d3d9e0;
+    border-radius: 0;
+    background: transparent;
+    outline: none;
+    font-size: 17px;
+    color: t.$field-text;
+  }
+
+  .name-input:focus {
+    border-bottom-color: t.$primary;
+    box-shadow: 0 1px 0 t.$primary;
+  }
+
+  .name-input::placeholder {
+    color: #a1a9b3;
+    font-weight: 400;
+  }
+
+  .name-input[aria-invalid='true'] {
+    border-bottom-color: t.$error;
+  }
+
+  .time-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field-error {
+    margin-top: 5px;
+    font-size: 11px;
+    color: t.$error;
+  }
+
+  .form-duration {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: t.$font-mono;
+    color: t.$text-muted;
+    font-size: 10px;
+    margin-top: 10px;
+  }
+
+  .form-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 17px;
+    padding: 10px 11px;
+    border-left: 2px solid t.$error;
+    background: #fff0ec;
+    color: #983821;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .form-error > svg {
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .form-notice {
+    padding: 9px 11px;
+    margin-bottom: 17px;
+    background: #f2f4f7;
+    color: #6a7584;
+    font-size: 11px;
+  }
+
+  .busy-intervals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .busy-interval {
+    padding: 4px 7px;
+    background: t.$surface-muted;
+    border-radius: 2px;
+    color: t.$text-muted;
+    font-family: t.$font-mono;
+    font-size: 9px;
+  }
+
+  .busy-intervals-label {
+    font-family: t.$font-sans;
+    background: transparent;
+    padding: 4px 7px 4px 0;
+    color: t.$text-muted;
+    font-size: 10px;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 20px 0 23px;
+    margin-top: 22px;
+    border-top: 1px solid t.$border;
+  }
+
+  .modal-footer .cancel-button {
+    margin-left: auto;
+  }
+
+  .delete-button {
+    color: #9299a3;
+  }
+
+  .delete-button:hover {
+    color: t.$error;
+    background: #fff0ed;
+  }
+}
+
+.delete-modal {
+  background: t.$surface;
+  border-radius: 6px;
+  padding: 24px;
+  max-width: 390px;
+
+  h2 {
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+  }
+}
+
+@include m.mobile {
+  .booking-modal {
+    .modal-header {
+      padding: 20px 21px 17px;
+    }
+
+    .booking-form {
+      padding: 20px 21px 0;
+    }
+  }
+}

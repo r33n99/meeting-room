@@ -1,0 +1,73 @@
+@use '@/styles/tokens' as t;
+@use '@/styles/mixins' as m;
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: 25px 20px;
+  border-right: 1px solid t.$border;
+  background: t.$sidebar;
+}
+
+.sidebar-today {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+  margin-top: 24px;
+  padding: 10px 12px;
+  border: 1px solid #c6cdd6;
+  border-radius: 4px;
+  background: t.$surface;
+  color: #343e4a;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 1px 2px #1d2b3d08;
+
+  &:hover {
+    border-color: #a3afbd;
+    background: #edf0f4;
+  }
+
+  &:active {
+    border-color: t.$primary;
+    background: #fff0e9;
+    color: t.$primary;
+    box-shadow: none;
+  }
+
+  span {
+    color: #697583;
+    font-family: t.$font-mono;
+    font-size: 10px;
+    font-weight: 400;
+  }
+}
+
+.sidebar-timezone {
+  color: t.$text-secondary;
+  font-size: 10px;
+  margin-top: 16px;
+}
+
+@include m.tablet {
+  .sidebar {
+    padding-inline: 15px;
+  }
+}
+
+@include m.mobile {
+  .sidebar {
+    display: none;
+
+    &:has(.demo-panel) {
+      display: block;
+      padding: 0 18px;
+      border: 0;
+    }
+
+    &:has(.demo-panel) > :not(.demo-panel) {
+      display: none;
+    }
+  }
+}

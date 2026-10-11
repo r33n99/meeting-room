@@ -1,0 +1,28 @@
+@use 'tokens' as t;
+
+@mixin mobile {
+  @media (max-width: t.$mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: t.$tablet) {
+    @content;
+  }
+}
+
+@mixin wide {
+  @media (min-width: (t.$workspace-max + 1px)) {
+    @content;
+  }
+}
+
+@mixin popover($width) {
+  z-index: 90;
+  width: $width;
+  border: 1px solid t.$input-border;
+  border-radius: 4px;
+  background: t.$surface;
+  box-shadow: t.$popover-shadow;
+}

@@ -1,0 +1,76 @@
+@use '@/styles/tokens' as t;
+@use '@/styles/mixins' as m;
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: t.$primary;
+  color: t.$surface;
+  font-size: 13px;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background: t.$primary-hover;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+  }
+}
+
+.secondary-button {
+  background: t.$surface;
+  color: #444b54;
+  border-color: t.$border;
+
+  &:hover:not(:disabled) {
+    background: #f0f2f4;
+  }
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #66707a;
+
+  &:hover {
+    background: #e9ecf0;
+    color: t.$foreground;
+  }
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: #4b5560;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 3px;
+
+  &:hover {
+    background: #eceff2;
+  }
+}
+
+@include m.mobile {
+  .action-button {
+    height: 37px;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+}

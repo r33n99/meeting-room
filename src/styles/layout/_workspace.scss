@@ -1,0 +1,95 @@
+@use '@/styles/tokens' as t;
+@use '@/styles/mixins' as m;
+
+.workspace {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-rows: 72px 1fr;
+  min-height: 100dvh;
+  max-width: t.$workspace-max;
+  margin: 0 auto;
+  background: t.$surface;
+  border-inline: 1px solid t.$border;
+}
+
+.app-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 0 32px;
+  border-bottom: 1px solid t.$border;
+
+  h1 {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+    margin: 0;
+  }
+}
+
+.header-hours {
+  padding-left: 24px;
+  border-left: 1px solid t.$border;
+  color: #69717b;
+  font-family: t.$font-mono;
+  font-size: 11px;
+}
+
+.new-booking {
+  margin-left: auto;
+}
+
+.schedule {
+  min-width: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 20px;
+  z-index: 100;
+
+  &:focus {
+    top: 12px;
+    padding: 10px;
+    background: t.$surface;
+  }
+}
+
+@include m.wide {
+  .workspace {
+    margin-block: 24px;
+    min-height: calc(100dvh - 48px);
+    border: 1px solid t.$border;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+}
+
+@include m.tablet {
+  .workspace {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+}
+
+@include m.mobile {
+  .workspace {
+    display: block;
+    border-inline: 0;
+  }
+
+  .app-header {
+    height: 66px;
+    padding-inline: 18px;
+    gap: 10px;
+
+    h1 {
+      font-size: 16px;
+    }
+  }
+
+  .header-hours {
+    display: none;
+  }
+}
